@@ -1,0 +1,15 @@
+use: stack
+short: stack cli
+persistent_pre_run: true
+persistent_post_run: true
+commands:
+  - use: list
+    short: list stacki objects
+    commands:
+      - use: zone [zone ...]
+        short: list zone information
+      - use: cluster
+        short: list cluster information
+      - use: host
+        short: list host information
+        flags: true
