@@ -7,7 +7,25 @@ var cmdTpl = `
 {{ define "header" }}
 package main
 
-import "github.com/spf13/cobra"
+import (
+	"context"
+	"github.com/spf13/cobra"
+)
+
+type cmdKey struct{}
+
+func withContext(ctx context.Context, cmd *cobra.Command) context.Context {
+	return context.WithValue(ctx, cmdKey{}, cmd)
+}
+
+// Ctx returns the *cobra.Commad associated with the ctx.
+func Ctx(ctx context.Context) *cobra.Command {
+	if c, ok := ctx.Value(cmdKey{}).(*cobra.Command); ok {
+		return c
+	}
+
+	return nil
+}
 
 {{ end }}
 
@@ -36,7 +54,7 @@ func New{{ .Fullname }}Cmd() *cobra.Command {
 
 {{ if .PersistentPreRun -}}
         PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-            ctx := cmd.Context()
+            ctx := withContext(cmd.Context(), cmd)
             if err := RootPersistentPreRun(ctx, args); err != nil { return err }
             if cmd.Context() != ctx { cmd.SetContext(ctx) }
             return nil
@@ -44,7 +62,7 @@ func New{{ .Fullname }}Cmd() *cobra.Command {
 {{ end -}}
 {{ if .PersistentPostRun -}}
         PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
-            ctx := cmd.Context()
+            ctx := withContext(cmd.Context(), cmd)
             if err := RootPersistentPostRun(ctx, args); err != nil { return err }
             if cmd.Context() != ctx { cmd.SetContext(ctx) }
             return nil
@@ -53,10 +71,11 @@ func New{{ .Fullname }}Cmd() *cobra.Command {
 
 {{ if not .NoRun -}}
         RunE: func(cmd *cobra.Command, args []string) error {
+            ctx := withContext(cmd.Context(), cmd)
 {{ if .Flags -}}
-            return {{ .Fullname }}(cmd.Context(), args, flags)
+            return {{ .Fullname }}(ctx, args, flags)
 {{ else -}}
-            return {{ .Fullname }}(cmd.Context(), args)
+            return {{ .Fullname }}(ctx, args)
 {{ end -}}
         },
 
