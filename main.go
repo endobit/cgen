@@ -15,6 +15,7 @@ import (
 
 type cmd struct {
 	IsRoot            bool
+	Application       string
 	Name              string
 	Fullname          string
 	Use               string   `yaml:"use"`
@@ -70,19 +71,21 @@ func fullname(base, use string) string {
 func process(cmd *cmd) {
 	cmd.IsRoot = true
 	cmd.Name = strings.Fields(cmd.Use)[0]
+	cmd.Application = cmd.Name
 	cmd.Fullname = "Root"
 
 	for i := range cmd.Commands {
-		processCommand("", &cmd.Commands[i])
+		processCommand(cmd.Application, "", &cmd.Commands[i])
 	}
 }
 
-func processCommand(basename string, cmd *cmd) {
+func processCommand(app, basename string, cmd *cmd) {
+	cmd.Application = app
 	cmd.Name = strings.Fields(cmd.Use)[0]
 	cmd.Fullname = fullname(basename, cmd.Name)
 
 	for i := range cmd.Commands {
-		processCommand(cmd.Fullname, &cmd.Commands[i])
+		processCommand(app, cmd.Fullname, &cmd.Commands[i])
 	}
 }
 

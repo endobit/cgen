@@ -15,13 +15,13 @@ import "github.com/spf13/cobra"
 {{ if .IsRoot -}}
 // NewRootCmd returns the top most *cobra.Command for the {{ .Name }} application.
 {{ else -}}
-// New{{ .Fullname }}Cmd return a *cobra.Command for "{{ snakecase .Fullname | replace "_" " "}}".
+// New{{ .Fullname }}Cmd returns a *cobra.Command for "{{ .Application }} {{ snakecase .Fullname | replace "_" " "}}".
 {{ end -}}
 func New{{ .Fullname }}Cmd() *cobra.Command {
 {{ if .Flags -}}
     var flags {{ .Fullname}}Flags
-{{ end }}
 
+{{ end -}}
     cmd := &cobra.Command{
         Use: "{{ .Use }}",
 {{ if ne .Short "" -}}
