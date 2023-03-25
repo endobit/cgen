@@ -14,7 +14,9 @@ type meta struct {
 	ImportPackage string
 }
 
-type command struct {
+// Command represents a cobra.Command with additional meta-data to be used
+// during template execution.
+type Command struct {
 	Meta              meta
 	IsRoot            bool
 	Name              string
@@ -31,17 +33,17 @@ type command struct {
 	PersistentPostRun bool      `yaml:"persistent_post_run"`
 	PreRun            bool      `yaml:"pre_run"`
 	PostRun           bool      `yaml:"post_run"`
-	Commands          []command `yaml:"commands"`
+	Commands          []Command `yaml:"commands"`
 }
 
 // ParseCommand parses a yaml spec file and return the command.
-func ParseCommand(file string) (*command, error) {
+func ParseCommand(file string) (*Command, error) {
 	fin, err := os.Open(file)
 	if err != nil {
 		return nil, err
 	}
 
-	var cmd command
+	var cmd Command
 
 	d := yaml.NewDecoder(fin)
 	if err := d.Decode(&cmd); err != nil {
@@ -52,7 +54,7 @@ func ParseCommand(file string) (*command, error) {
 }
 
 // ForAll executed f on c and all its sub-commands.
-func (c *command) ForAll(f func(*command)) {
+func (c *Command) ForAll(f func(*Command)) {
 	f(c)
 
 	for i := range c.Commands {
@@ -62,7 +64,7 @@ func (c *command) ForAll(f func(*command)) {
 
 // Configure traverses c and populates all the meta data to prepare for template
 // execution.
-func (c *command) Configure(pkg, imp string) {
+func (c *Command) Configure(pkg, imp string) {
 	var impbase string
 
 	if imp != "" {
@@ -81,7 +83,7 @@ func (c *command) Configure(pkg, imp string) {
 		ImportPackage: impbase,
 	}
 
-	c.ForAll(func(c *command) {
+	c.ForAll(func(c *Command) {
 		c.Meta = meta
 	})
 
@@ -90,7 +92,7 @@ func (c *command) Configure(pkg, imp string) {
 	}
 }
 
-func (c *command) configure(basename string) {
+func (c *Command) configure(basename string) {
 	c.Name = strings.Fields(c.Use)[0]
 	c.Fullname = fullname(basename, c.Name)
 

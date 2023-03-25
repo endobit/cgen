@@ -24,7 +24,7 @@ func NewTemplate() (*template.Template, error) {
 	return tmpl.ParseFS(disk, "*.tmpl")
 }
 
-func generateCode(w io.Writer, tmpl *template.Template, cmd *command) error {
+func generateCode(w io.Writer, tmpl *template.Template, cmd *Command) error {
 	if err := tmpl.ExecuteTemplate(w, "header", cmd); err != nil {
 		return err
 	}
@@ -42,7 +42,7 @@ func generateCode(w io.Writer, tmpl *template.Template, cmd *command) error {
 	return nil
 }
 
-func genCommand(w io.Writer, tmpl *template.Template, cmd command) error {
+func genCommand(w io.Writer, tmpl *template.Template, cmd Command) error {
 	if err := tmpl.ExecuteTemplate(w, "command", cmd); err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func genCommand(w io.Writer, tmpl *template.Template, cmd command) error {
 	return nil
 }
 
-func generateStubs(w io.Writer, tmpl *template.Template, cmd *command) error {
+func generateStubs(w io.Writer, tmpl *template.Template, cmd *Command) error {
 	if err := tmpl.ExecuteTemplate(w, "header", cmd); err != nil {
 		return err
 	}
@@ -74,6 +74,6 @@ func generateStubs(w io.Writer, tmpl *template.Template, cmd *command) error {
 	return nil
 }
 
-func genStub(w io.Writer, tmpl *template.Template, cmd command) error {
+func genStub(w io.Writer, tmpl *template.Template, cmd Command) error {
 	return tmpl.ExecuteTemplate(w, "stubs", cmd)
 }
