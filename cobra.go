@@ -1,3 +1,5 @@
+// Generated code - Do Not Edit -
+
 package main
 
 import (
