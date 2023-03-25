@@ -1,0 +1,13 @@
+{{ define "header" }}
+// Generated code - Do Not Edit -
+    
+package {{ .Meta.Package }}
+
+import (
+    "github.com/spf13/cobra"
+{{ if .Meta.ImportPath -}}
+    "{{ .Meta.ImportPath }}"
+{{ end -}}
+)
+
+{{ end }}

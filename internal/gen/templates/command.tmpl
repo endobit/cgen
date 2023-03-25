@@ -1,0 +1,75 @@
+{{ define "fqdn" -}}
+    {{ if .Meta.ImportPackage -}}
+	{{ .Meta.ImportPackage }}.{{ .Fullname -}}
+    {{ else -}}
+	{{ .Fullname -}}
+    {{ end -}}
+{{ end }}
+
+{{ define "command" }}
+    {{ if .IsRoot -}}
+// NewRootCmd returns the top most *cobra.Command for the {{ .Name }} application.
+    {{ else -}}
+// New{{ .Fullname }}Cmd returns a *cobra.Command for "{{ .Meta.Application }} {{ snakecase .Fullname | replace "_" " "}}".
+    {{ end -}}
+func New{{ .Fullname }}Cmd() *cobra.Command {
+    {{ if .Flags -}}
+    var flags {{ template "fqdn" . }}Flags
+
+    {{ end -}}
+    cmd := &cobra.Command{
+        Use: "{{ .Use }}",
+    {{ if ne .Short "" -}}
+	Short: "{{ .Short }}",
+    {{ end -}}
+    {{ if ne .Long "" -}}
+	Long: "{{ .Long }}",
+    {{ end -}}
+    {{ if ne .Args "" -}}
+	Args: {{ .Args }},
+    {{ end -}}
+
+    {{ if .PersistentPreRun -}}
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+	    return {{ template "fqdn" . }}PersistentPreRun(cmd, args)
+	},
+    {{ end -}}
+    {{ if .PersistentPostRun -}}
+	PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
+	    return {{ template "fqdn" . }}PersistentPostRun(cmd, args)
+	},
+    {{ end -}}
+
+    {{ if .PreRun -}}
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+	    return {{ template "fqdn" . }}PreRun(cmd, args)
+	},
+    {{ end -}}
+    {{ if .PostRun -}}
+	PostRunE: func(cmd *cobra.Command, args []string) error {
+	    return {{ template "fqdn" . }}PostRun(cmd, args)
+	},
+    {{ end -}}
+
+    {{ if not .NoRun -}}
+	RunE: func(cmd *cobra.Command, args []string) error {
+	{{ if .Flags -}}
+	    return {{ template "fqdn" . }}Run(cmd, args, flags)
+	{{ else -}}
+	    return {{ template "fqdn" . }}Run(cmd, args)
+	{{ end -}}
+	},
+    {{ end -}}
+    }
+
+    {{ if .Flags -}}
+    flags.Bind(cmd)
+    {{ end }}
+
+    {{ range .Commands -}}
+    cmd.AddCommand(New{{ .Fullname }}Cmd())
+    {{ end }}
+
+    return cmd
+}
+{{ end }}

@@ -1,0 +1,4 @@
+use: cgen spec.yaml
+short: cobra generator
+args: cobra.MaximumNArgs(1)
+flags: true

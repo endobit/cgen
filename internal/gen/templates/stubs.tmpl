@@ -1,0 +1,29 @@
+{{ define "stubs" }}
+    {{ if .Flags -}}
+	{{ if .IsRoot -}}
+// {{ .Fullname }}Flags holds the pflag variables for the {{ .Name }} application.
+	{{ else -}}
+// {{ .Fullname }}Flags holds the pflag variables for "{{ snakecase .Fullname | replace "_" " "}}".
+	{{ end -}}
+type {{ .Fullname }}Flags struct {
+}
+
+// Bind attaches f to the cobra.Command.
+func (f *{{ .Fullname }}Flags) Bind(cmd *cobra.Command) {
+}
+    {{ end }}
+    {{ if not .NoRun }}
+	{{ if .IsRoot -}}
+// {{ .Fullname }}Run implements the cli for the {{ .Name }} application.
+	{{ else -}}
+// {{ .Fullname }}Run implements the cli "{{ snakecase .Fullname | replace "_" " "}}" command.
+	{{ end -}}
+	{{ if .Flags -}}
+func {{ .Fullname }}Run(cmd *cobra.Command, args []string, flags {{ .Fullname}}Flags) error {
+	{{ else -}}
+func {{ .Fullname }}Run(cmd *cobra.Command, args []string) error {
+	{{ end -}}
+    return nil
+}
+    {{ end }}
+{{ end }}
