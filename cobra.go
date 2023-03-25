@@ -12,7 +12,7 @@ func NewRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "cgen spec.yaml",
 		Short: "cobra generator",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return gen.RootRun(cmd, args, flags)
 		},

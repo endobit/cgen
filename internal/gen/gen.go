@@ -32,7 +32,12 @@ func (f *RootFlags) Bind(cmd *cobra.Command) {
 
 // RootRun is the "cgen" command.
 func RootRun(_ *cobra.Command, args []string, flags RootFlags) error {
-	spec, err := ParseCommand(args[0])
+	input := "cobra.yaml"
+	if len(args) > 0 {
+		input = args[0]
+	}
+
+	spec, err := ParseCommand(input)
 	if err != nil {
 		return err
 	}
