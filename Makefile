@@ -6,3 +6,12 @@ $(BUILDER)/rules.mk:
 
 build::
 	$(GO_BUILD) .
+
+.PHONY: cobra.go
+cobra.go: cobra.yaml
+	go run . cobra.yaml --import="github.com/endobit/cgen/internal/gen" > cobra
+	mv cobra cobra.go
+
+generate:: cobra.go
+
+
